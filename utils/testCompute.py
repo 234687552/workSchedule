@@ -29,12 +29,22 @@ def getDueTime(am_start, am_end, pm_start, pm_end, period):
 
 
 if __name__ == '__main__':
-    am_start = '08:30'
-    am_end = '12:00'
-    pm_start = '13:30'
-    pm_end = '18:00'
-    period = '60'
+    # am_start = '08:30'
+    # am_end = '12:00'
+    # pm_start = '13:30'
+    # pm_end = '18:00'
+    # period = '60'
+    #
+    # getDueTime(am_start, am_end, pm_start, pm_end, pm_start)
 
-    getDueTime(am_start, am_end, pm_start, pm_end, pm_start)
+    day = time.strftime("%Y-%m-%d ")
+    am_start =day+'08:30'
+    timeArray = time.strptime(am_start, "%Y-%m-%d %H:%M")
+    # 转换为时间戳:
+    timeStamp = int(time.mktime(timeArray))
+
+    timeArray = time.localtime(timeStamp)
+    otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
+    print timeStamp ,otherStyleTime
 
 
