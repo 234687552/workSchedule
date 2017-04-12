@@ -2,7 +2,6 @@
 import datetime
 import time
 import wx
-from scheduler.MyScheduler import Scheduler
 
 class TaskBarIcon(wx.TaskBarIcon):
     ID_Play = wx.NewId()
@@ -102,14 +101,6 @@ def TestFrame():
     frame.Centre()
     frame.Show()
 
-    scheduler = Scheduler.get_instance().getScheduler()
-    print datetime.datetime.now()
-    rundata1 = time.strftime('%Y-%m-%d ') + time.strftime('%H:%M:') + str((int(time.strftime('%S')) + 3))
-    rundata2 = time.strftime('%Y-%m-%d ') + time.strftime('%H:%M:') + str((int(time.strftime('%S')) + 6))
-    rundata3 = time.strftime('%Y-%m-%d ') + time.strftime('%H:%M:') + str((int(time.strftime('%S')) + 9))
-    scheduler.add_job(my_job, 'date', run_date=rundata1)
-    scheduler.add_job(my_job, 'date', run_date=rundata2)
-    scheduler.add_job(my_job, 'date', run_date=rundata3)
 
     app.MainLoop()
 
