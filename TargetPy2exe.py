@@ -8,7 +8,7 @@ __email__ = ' '
 from PyInstaller.__main__ import run
 
 if __name__ == '__main__':
-    # opts = ['tuopan.py', '-F']
-    # opts = ['tuopan.py', '-F', '-w']
-    opts = ['tuopan.py', '-F', '-w', '--icon=wx.ico','--upx-dir','upx391w']
+    # opts = ['workTimer.py', '-F']
+    # opts = ['workTimer.py', '-F', '-w']
+    opts = ['workTimer.py', '-F', '-w', '--icon=loadIcon.ico', '--upx-dir', 'upx391w']
     run(opts)

@@ -97,6 +97,7 @@ class MyFrame(wx.Frame):
         self.start_toggle.Bind(wx.EVT_BUTTON, self.OnStartToggle)
 
         # add by wxFormBuilder ¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü  no modify by code
+
         self.dialog = None
         self.SetIcon(wx.Icon('loadIcon.ico', wx.BITMAP_TYPE_ICO))  # ÉèÖÃÍ¼±ê
 

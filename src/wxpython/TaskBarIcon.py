@@ -37,10 +37,12 @@ class TaskBarIcon(wx.TaskBarIcon):
         wx.MessageBox('Copr. 2017 lzd', 'About')
 
     def OnExit(self, event):
+        # 关闭对话框
+        if self.frame.dialog :
+            self.frame.dialog.Destroy()
+
         # 关闭托盘
         self.frame.taskBarIcon.Destroy()
-        # 关闭对话框
-        if None != self.frame.dialog:
-            self.frame.dialog.Destroy()
+
         # 关闭本体
         self.frame.Destroy()
