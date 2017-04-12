@@ -116,7 +116,8 @@ class MyFrame(wx.Frame):
     # ÷ÿ÷√…Ë÷√
     def OnResetLastConf(self, event):
         print "OnResetLastConf"
-        self.dialog = MyDialog()
+        if not self.dialog:
+            self.dialog = MyDialog()
         self.dialog.Show()
         event.Skip()
 

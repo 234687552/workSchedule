@@ -5,7 +5,8 @@ import wx.xrc
 
 # 托盘控制
 class TaskBarIcon(wx.TaskBarIcon):
-    ID_ABOUT = wx.NewId()  # 定义好菜单ID - HELLO
+    ID_MEMO = wx.NewId()  # 定义好菜单ID - 备忘
+    ID_ABOUT = wx.NewId()  # 定义好菜单ID - 关于
     ID_EXIT = wx.NewId()  # 定义好菜单ID - EXIT
 
     def __init__(self, frame):
@@ -20,6 +21,7 @@ class TaskBarIcon(wx.TaskBarIcon):
     # override 创建托盘右击菜单
     def CreatePopupMenu(self):
         menu = wx.Menu()
+        menu.Append(self.ID_MEMO, '备忘')
         menu.Append(self.ID_ABOUT, '关于')
         menu.Append(self.ID_EXIT, '退出')
         return menu

@@ -3,7 +3,7 @@
 import datetime
 import time
 
-from src.scheduler.MyScheduler import Scheduler
+from src.scheduler.Scheduler import Scheduler
 
 
 def my_job():

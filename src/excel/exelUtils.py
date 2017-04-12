@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import shutil
 
 import time
 import xlrd
@@ -7,6 +8,7 @@ import xlwt
 from datetime import date
 
 from src.base.ReturnInfo import ReturnInfo
+from src.excel import getNameUtils
 
 '''
 # 读取Excel数据
@@ -16,6 +18,27 @@ from src.base.ReturnInfo import ReturnInfo
 #         col_list    : 读取数据后对应的列字段，如: ['id' , 'name' , 'value']
 # 返回: List
 '''
+from xlwt import *
+
+if __name__ == '__main__':
+    file_name = time.strftime("%W") + ".xls"  # shutil.copy遇到中文名称会报错 所以取这一年第几周 作为文件名  result:15.xls
+    full_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), file_name)
+    # 判断文件是否存在
+    if not os.path.isfile(file_name):
+        shutil.copy("E:\pycharm_workspace\workScript\.importance\\11.xls", full_filename)
+
+    data = xlrd.open_workbook(file_name)
+    try:
+        sheet1 = data.sheet_by_name(time.strftime("%m月%d日").decode('utf-8', 'ignore'))
+    except Exception as e:
+        # 创建workbook对象
+        curBook = xlwt.Workbook()
+        # 设定编码
+        curBook.encoding = 'gbk'
+        # 添加Sheet表；其中cell_overwrite_ok，表示是否可以覆盖单元格
+        sheet1 = curBook.add_sheet(time.strftime("%m月%d日").decode('utf-8', 'ignore'))
+        # 执行保存
+        curBook.save(full_filename)
 
 
 def readExcel(file_name, col_list):
