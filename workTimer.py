@@ -5,6 +5,8 @@ import wx.xrc
 
 from src.wxpython.MyFrame import MyFrame
 from src.scheduler.Scheduler import Scheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
 
 # 启动界面
 def StartFrame():
@@ -18,7 +20,7 @@ def StartFrame():
 # 开始计划任务
 def StartSchedule():
     scheduler = Scheduler.getInstance().getScheduler()
-    scheduler.add_job(myJob, 'interval', seconds=3)
+    scheduler.add_job(myJob, trigger=IntervalTrigger(seconds=3))
 
 
 def myJob():

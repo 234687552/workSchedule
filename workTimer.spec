@@ -4,11 +4,11 @@ block_cipher = None
 
 
 a = Analysis(['workTimer.py'],
-             pathex=['E:\\pycharm_workspace\\myScript'],
+             pathex=['E:\\mywork_lzd\\python_space\\workScript'],
              binaries=[],
              datas=[],
              hiddenimports=[],
-             hookspath=[],
+             hookspath=['.'],
              runtime_hooks=[],
              excludes=[],
              win_no_prefer_redirects=False,
