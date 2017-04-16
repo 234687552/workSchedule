@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding:utf-8 -*-
 from copy import deepcopy
 
 import time
@@ -12,6 +12,30 @@ import xlwt
 from src.entity import ExcelData
 from src.entity.ReturnInfo import ReturnInfo
 
+'''
+设置单元格样式
+'''
+
+
+def set_style(name, height, bold=False):
+    style = xlwt.XFStyle()  # 初始化样式
+
+    font = xlwt.Font()  # 为样式创建字体
+    font.name = name  # 'Times New Roman'
+    font.bold = bold
+    font.color_index = 4
+    font.height = height
+
+    # borders= xlwt.Borders()
+    # borders.left= 6
+    # borders.right= 6
+    # borders.top= 6
+    # borders.bottom= 6
+
+    style.font = font
+    # style.borders = borders
+
+    return style
 
 # 修改值
 
@@ -70,6 +94,11 @@ def copySheet(fileName, sourceSheetName, newSheetName, outFile):
 
     newSheet = deepcopy(wb.get_sheet(sourceSheetIndex))  # 用deepcopy防止对象是同一个
     newSheet.set_name(newSheetName)
+    # setOutCell(newSheet,1,1,"hello")
+    newSheet.write(24,2,u'dafa',set_style('Times New Roman',220,True))
+    newSheet.write(1,1,u'dafa',set_style('Times New Roman',220,True))
+    newSheet.write(2,2,"hee".decode('utf-8', 'ignore'),set_style('Times New Roman',220,True))
+    newSheet.write(3,3,"hee".decode('utf-8', 'ignore'),set_style('Times New Roman',220,True))
 
     wb._Workbook__worksheets.append(newSheet)
     wb.set_active_sheet(0)
@@ -85,13 +114,15 @@ def writeExcel(fileName, sheetName, excelData):
         # copySheet(samplePath, 'sample', todaySheetName.decode('utf-8', 'ignore'), fileName)  # 没有就把样本拷贝过来
         copySheet(samplePath, 'sample', todaySheetName.decode('utf-8', 'ignore'), fileName)  # 没有就把样本拷贝过来
 
-    rb = xlrd.open_workbook(fileName, formatting_info=True)
-
-    wb = xlutils.copy.copy(rb)
-    worksheet = wb.get_sheet(0)
-    worksheet.write(0, 0, "hello")
-    setOutCell(worksheet, 1, 2, 'sfa')
-    wb.save(fileName)
+    rb = xlrd.open_workbook(r'tt.xls', formatting_info=True)
+    rs = rb.sheet_by_index(0)
+    print rs.cell(24,2).value,rs.cell(1,1).value,rs.cell(2,2).value
+    #
+    # wb = xlutils.copy.copy(rb)
+    # worksheet = wb.get_sheet(0)
+    # worksheet.write(0, 0, "hello")
+    # setOutCell(worksheet, 1, 2, 'sfa')
+    # wb.save(fileName)
 
 
 writeExcel('tt.xls', 'sample', None)
