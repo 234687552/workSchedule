@@ -12,7 +12,7 @@ class TaskBarIcon(wx.TaskBarIcon):
     def __init__(self, frame):
         wx.TaskBarIcon.__init__(self)
         self.frame = frame
-        self.SetIcon(wx.Icon(name='loadIcon.ico', type=wx.BITMAP_TYPE_ICO), 'TaskBarIcon!')
+        self.SetIcon(wx.Icon(name='.importance\loadIcon.ico', type=wx.BITMAP_TYPE_ICO), 'TaskBarIcon!')
         self.Bind(wx.EVT_TASKBAR_LEFT_DCLICK, self.OnTaskBarLeftDClick)  # 左键双击托盘事件
 
         self.Bind(wx.EVT_MENU, self.OnAbout, id=self.ID_ABOUT)  # 点击菜单about的事件

@@ -84,3 +84,17 @@ def TimeStamp2Str(timeStamp):
     timeArray = time.localtime(float(timeStamp))
     strTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
     return strTime
+
+
+if __name__ == '__main__':
+    am_start = '08:30'
+    am_end = '12:00'
+    pm_start = '13:30'
+    pm_end = '18:00'
+    period = 60
+    aheadTime = 5
+
+    result = getDueTime(am_start, am_end, pm_start, pm_end, period, aheadTime)
+
+    for item in result:
+        print TimeStamp2Str(item)

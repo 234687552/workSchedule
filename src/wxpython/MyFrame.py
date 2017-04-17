@@ -4,8 +4,10 @@ import wx.xrc
 from TaskBarIcon import TaskBarIcon
 from MyDialog import MyDialog
 
-
 # 面板布局格式
+from src.event.eventCtrl import EventCtrl
+
+
 class MyFrame(wx.Frame):
     def __init__(
             self, parent=None, id=wx.ID_ANY, title='TaskBarIcon', pos=wx.DefaultPosition,
@@ -21,7 +23,7 @@ class MyFrame(wx.Frame):
 
         gSizer2 = wx.GridSizer(0, 4, 0, 0)
 
-        self.m_staticText2 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, u"早上", wx.DefaultPosition,
+        self.m_staticText2 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, u"早上:", wx.DefaultPosition,
                                            wx.DefaultSize, 0)
         self.m_staticText2.Wrap(-1)
         gSizer2.Add(self.m_staticText2, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 5)
@@ -39,7 +41,7 @@ class MyFrame(wx.Frame):
                                   wx.TE_CENTRE)
         gSizer2.Add(self.am_end, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 5)
 
-        self.m_staticText4 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, u"下午", wx.DefaultPosition,
+        self.m_staticText4 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, u"下午:", wx.DefaultPosition,
                                            wx.DefaultSize, 0)
         self.m_staticText4.Wrap(-1)
         gSizer2.Add(self.m_staticText4, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 5)
@@ -76,16 +78,47 @@ class MyFrame(wx.Frame):
 
         bSizer1.Add(gSizer3, 1, wx.EXPAND, 5)
 
-        gSizer5 = wx.GridSizer(0, 2, 0, 0)
+        remind_time = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"提醒时间"), wx.VERTICAL)
 
-        self.reset_last_cof = wx.Button(self, wx.ID_ANY, u"重置设置", wx.DefaultPosition, wx.DefaultSize, 0)
-        gSizer5.Add(self.reset_last_cof, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_HORIZONTAL, 5)
+        fgSizer4 = wx.FlexGridSizer(0, 2, 0, 0)
+        fgSizer4.AddGrowableCol(1)
+        fgSizer4.AddGrowableRow(1)
+        fgSizer4.SetFlexibleDirection(wx.BOTH)
+        fgSizer4.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
+
+        self.m_staticText16 = wx.StaticText(remind_time.GetStaticBox(), wx.ID_ANY, u"早上:", wx.DefaultPosition,
+                                            wx.DefaultSize, 0)
+        self.m_staticText16.Wrap(-1)
+        fgSizer4.Add(self.m_staticText16, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 5)
+
+        self.am_lists = wx.StaticText(remind_time.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition,
+                                      wx.DefaultSize, 0)
+        self.am_lists.Wrap(-1)
+        fgSizer4.Add(self.am_lists, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
+
+        self.m_staticText18 = wx.StaticText(remind_time.GetStaticBox(), wx.ID_ANY, u"下午:", wx.DefaultPosition,
+                                            wx.DefaultSize, 0)
+        self.m_staticText18.Wrap(-1)
+        fgSizer4.Add(self.m_staticText18, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_HORIZONTAL, 5)
+
+        self.pm_lists = wx.StaticText(remind_time.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition,
+                                      wx.DefaultSize, 0)
+        self.pm_lists.Wrap(-1)
+        fgSizer4.Add(self.pm_lists, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
+
+        remind_time.Add(fgSizer4, 1, wx.EXPAND, 5)
+
+        bSizer1.Add(remind_time, 1, wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND, 5)
+
+        gSizer4 = wx.GridSizer(0, 2, 0, 0)
+
+        self.reset = wx.Button(self, wx.ID_ANY, u"重置", wx.DefaultPosition, wx.DefaultSize, 0)
+        gSizer4.Add(self.reset, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
 
         self.start_toggle = wx.Button(self, wx.ID_ANY, u"开始", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.start_toggle.SetDefault()
-        gSizer5.Add(self.start_toggle, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT, 5)
+        gSizer4.Add(self.start_toggle, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT, 5)
 
-        bSizer1.Add(gSizer5, 1, wx.ALIGN_RIGHT, 5)
+        bSizer1.Add(gSizer4, 0, wx.ALIGN_RIGHT, 5)
 
         self.SetSizer(bSizer1)
         self.Layout()
@@ -93,13 +126,13 @@ class MyFrame(wx.Frame):
         self.Centre(wx.BOTH)
 
         # Connect Events
-        self.reset_last_cof.Bind(wx.EVT_BUTTON, self.OnResetLastConf)
+        self.reset.Bind(wx.EVT_BUTTON, self.OnReset)
         self.start_toggle.Bind(wx.EVT_BUTTON, self.OnStartToggle)
 
         # add by wxFormBuilder ↑↑↑↑↑↑↑↑↑  no modify by code
 
         self.dialog = None
-        self.SetIcon(wx.Icon('loadIcon.ico', wx.BITMAP_TYPE_ICO))  # 设置图标
+        self.SetIcon(wx.Icon('.importance\loadIcon.ico', wx.BITMAP_TYPE_ICO))  # 设置图标
 
         self.Bind(wx.EVT_CLOSE, self.OnClose)  # 关闭按钮
 
@@ -107,47 +140,20 @@ class MyFrame(wx.Frame):
 
         wx.Frame.SetMaxSize(self, size)  # 最大尺寸
         wx.Frame.SetMinSize(self, size)  # 最小尺寸
-        self.start = False  # 默认是没开始
 
     def __del__(self):
         pass
 
     # Virtual event handlers, overide them in your derived class
     # 重置设置
-    def OnResetLastConf(self, event):
-        print "OnResetLastConf"
-        if not self.dialog:
-            self.dialog = MyDialog()
-        self.dialog.Show()
+    def OnReset(self, event):
+        EventCtrl.getInstance().onReset(self)
         event.Skip()
 
     # 点击开始
     def OnStartToggle(self, event):
-        if self.start:
-            print "OnStopWork",
-            # 取消屏蔽编辑
-            self.am_end.Enable(True)
-            self.am_start.Enable(True)
-            self.pm_end.Enable(True)
-            self.pm_start.Enable(True)
-            self.period.Enable(True)
-            self.start_toggle.SetLabel("停止")
-            self.start = False
-        else:
-            print "OnStartWork"
-            # 屏蔽编辑
-            self.am_end.Enable(False)
-            self.am_start.Enable(False)
-            self.pm_end.Enable(False)
-            self.pm_start.Enable(False)
-            self.period.Enable(False)
-            self.start_toggle.SetLabel("开始")
-            self.start = True
-
+        EventCtrl.getInstance().onStartToggle(self)
         event.Skip()
-
-    def OnHide(self, event):
-        self.Hide()
 
     def OnClose(self, event):
         self.Hide()

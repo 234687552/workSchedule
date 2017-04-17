@@ -10,6 +10,7 @@ class Scheduler(object):
     def __init__(self):
         self.scheduler = BackgroundScheduler()
         self.scheduler.start()
+        self.jobIds = []
         pass
 
     @staticmethod
@@ -20,6 +21,13 @@ class Scheduler(object):
 
     def getScheduler(self):
         return self.scheduler
+
+    def addJob(self, seconds, fun):
+        self.jobIds.append(id(fun))
+        self.scheduler.add_job(fun, 'interval', seconds=seconds)
+
+    def removeJob(self, fun):
+        self.scheduler.remove_all_jobs()
 
         # def addJob(self, job,rundata):
         #     # scheduler.add_job(my_job, 'interval', seconds=3)

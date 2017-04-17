@@ -1,154 +1,96 @@
-# -*- coding:utf-8 -*-
-from copy import deepcopy
+# -*- coding: utf-8 -*-
 
-import time
 import os
 import shutil
-
 import xlrd
 import xlutils.copy
 import xlwt
 
-from src.entity import ExcelData
-from src.entity.ReturnInfo import ReturnInfo
+import time
 
-'''
-设置单元格样式
-'''
+from src.entity.ExcelData import ExcelData
+from src.utils import ComputeDueTime
 
 
-def set_style(name, height, bold=False):
+def ExcelStyle(name=u'宋体', height=220, frontColor=0, bold=False, isHorz=False, num_format='general', hasBorders=True):
     style = xlwt.XFStyle()  # 初始化样式
+    style.num_format_str = num_format  # 数字格式
 
     font = xlwt.Font()  # 为样式创建字体
     font.name = name  # 'Times New Roman'
     font.bold = bold
-    font.color_index = 4
+    font.colour_index = frontColor
     font.height = height
-
-    # borders= xlwt.Borders()
-    # borders.left= 6
-    # borders.right= 6
-    # borders.top= 6
-    # borders.bottom= 6
-
     style.font = font
-    # style.borders = borders
+
+    if hasBorders:
+        borders = xlwt.Borders()
+        borders.top = 1
+        borders.bottom = 1
+        borders.left = 1
+        borders.right = 1
+        borders.bottom_colour = 0x3A
+        style.borders = borders  # Add borders  to Style
+
+    alignment = xlwt.Alignment()
+    alignment.vert = xlwt.Alignment.VERT_CENTER  # 垂直居中
+    if isHorz:
+        alignment.horz = xlwt.Alignment.HORZ_CENTER  # 水平居中
+    style.alignment = alignment
 
     return style
 
-# 修改值
 
+def writeExcel(todayFile, excelData):
+    # 从某一cell开始往下搜索空闲的行，sheet 是xlrd.open_workbook().get_sheet的对象
+    def findFreeCell(sheet, startX, startY):
+        # sheet.cell(0,0).value  sheet.cell_value(0,1)
+        x = startX
+        while not sheet.cell_value(x, startY) == '':
+            x += 1
+        return x
 
-def setOutCell(outSheet, col, row, value):
-    """ Change cell value without changing formatting. """
-
-    def _getOutCell(outSheet, colIndex, rowIndex):
-        """ HACK: Extract the internal xlwt cell representation. """
-        row = outSheet._Worksheet__rows.get(rowIndex)
-        if not row: return None
-
-        cell = row._Row__cells.get(colIndex)
-        return cell
-
-    # HACK to retain cell style.
-    previousCell = _getOutCell(outSheet, col, row)
-    # END HACK, PART I
-
-    outSheet.write(row, col, value)
-
-    # HACK, PART II
-    if previousCell:
-        newCell = _getOutCell(outSheet, col, row)
-        if newCell:
-            newCell.xf_idx = previousCell.xf_idx
-            # END HACK
-
-
-'''
-# 使用范例:copySheet('test.xls', 'sample', 'fsdsa','test.xls')
-把excel的原有一个sheet复制并重命名
-'''
-
-
-def copySheet(fileName, sourceSheetName, newSheetName, outFile):
-    rb = xlrd.open_workbook(fileName, formatting_info=True)
-    sheets = rb.sheets()  # 所有的sheets
-    sourceSheetIndex = None
-    newSheetIndex = None
-    for i in range(len(sheets)):
-        if sourceSheetName == sheets[i].name:
-            sourceSheetIndex = i
-        if newSheetName == sheets[i].name:
-            newSheetIndex = i
-
-    if (sourceSheetIndex):
-        msg = '文件没有该名称的sheet:%s' % sourceSheetName
-        return ReturnInfo(-1, msg)
-    if (newSheetIndex):
-        msg = '文件已经包含该名称的sheet:%s' % newSheetName
-        return ReturnInfo(-1, msg)
-
-    # 以下为正常情况逻辑
+    rb = xlrd.open_workbook(todayFile, formatting_info=True)
     wb = xlutils.copy.copy(rb)  # 获取可编辑的对象
+    ws = wb.get_sheet(0)
+    if not ws.name == time.strftime("%m月%d日").decode('utf-8', 'ignore'):
+        ws.set_name(time.strftime("%m月%d日").decode('utf-8', 'ignore'))
+        ws.write(1, 9, time.strftime("%Y-%m-%d").decode('utf-8', 'ignore'), ExcelStyle(hasBorders=False, bold=True))
+    day = time.strftime("%Y-%m-%d ")  # 当天日期
+    if ComputeDueTime.Str2TimeStamp(day + excelData.start) <= ComputeDueTime.Str2TimeStamp(day + '12:00'):
+        freeX = findFreeCell(rb.sheet_by_index(0), 3, 2)  # 早上从3,3找往下找空闲的cell
+    else:
+        freex = findFreeCell(rb.sheet_by_index(0), 11, 2)  # 下午从3,3找往下找空闲的cell
 
-    newSheet = deepcopy(wb.get_sheet(sourceSheetIndex))  # 用deepcopy防止对象是同一个
-    newSheet.set_name(newSheetName)
-    # setOutCell(newSheet,1,1,"hello")
-    newSheet.write(24,2,u'dafa',set_style('Times New Roman',220,True))
-    newSheet.write(1,1,u'dafa',set_style('Times New Roman',220,True))
-    newSheet.write(2,2,"hee".decode('utf-8', 'ignore'),set_style('Times New Roman',220,True))
-    newSheet.write(3,3,"hee".decode('utf-8', 'ignore'),set_style('Times New Roman',220,True))
+    if len(excelData.workType) > 0:
+        ws.write(freeX, 2, excelData.workType.decode('utf-8', 'ignore'), ExcelStyle())  # 工作类型
+    if len(excelData.content) > 0:
+        ws.write(freeX, 3, excelData.content.decode('utf-8', 'ignore'), ExcelStyle())  # 具体内容
+    if len(excelData.result) > 0:
+        ws.write(freeX, 6, excelData.result.decode('utf-8', 'ignore'), ExcelStyle(isHorz=True))  # 输出结果
+    if len(excelData.start) > 0 and len(excelData.end) > 0:
+        startTimeStamp = ComputeDueTime.Str2TimeStamp(day + excelData.start)
+        endTimeStamp = ComputeDueTime.Str2TimeStamp(day + excelData.end)
+        duration = (endTimeStamp - startTimeStamp) / 60  # 单位从秒转分
+        ws.write(freeX, 9, duration, ExcelStyle(isHorz=True))  # 耗时
+    if len(excelData.remarks) > 0:
+        ws.write(freeX, 10, excelData.remarks.decode('utf-8', 'ignore'), ExcelStyle())  # 备注
 
-    wb._Workbook__worksheets.append(newSheet)
-    wb.set_active_sheet(0)
-    wb.save(outFile)
-    return ReturnInfo(1, "succeed")
+    ws.write(19, 9, xlwt.Formula('SUM(J4:J19)/60'), ExcelStyle(frontColor=2, bold=True, isHorz=True, num_format='0.00'))
+    wb.save(todayFile)
 
 
-def writeExcel(fileName, sheetName, excelData):
-    if not os.path.exists(fileName):
+def checkAndWriteExcel(excelData):
+    rootPath = os.path.dirname(os.path.dirname(os.getcwd()))  # 程序所在更目录：当前目录的上一层的上一层
+    todayFile = os.path.join(rootPath, time.strftime("%m-%d") + ".xls")  # 保存文件的全路径
+    if not os.path.exists(todayFile):
         samplePath = os.path.join(
             os.path.dirname(os.path.dirname(os.getcwd())), ".importance\sample.xls")  # 样本路径 当前目录的上一层的上一层
-        todaySheetName = time.strftime("%m月%d日")
-        # copySheet(samplePath, 'sample', todaySheetName.decode('utf-8', 'ignore'), fileName)  # 没有就把样本拷贝过来
-        copySheet(samplePath, 'sample', todaySheetName.decode('utf-8', 'ignore'), fileName)  # 没有就把样本拷贝过来
+        shutil.copy(samplePath, todayFile)
 
-    rb = xlrd.open_workbook(r'tt.xls', formatting_info=True)
-    rs = rb.sheet_by_index(0)
-    print rs.cell(24,2).value,rs.cell(1,1).value,rs.cell(2,2).value
-    #
-    # wb = xlutils.copy.copy(rb)
-    # worksheet = wb.get_sheet(0)
-    # worksheet.write(0, 0, "hello")
-    # setOutCell(worksheet, 1, 2, 'sfa')
-    # wb.save(fileName)
+    # writeExcel(todayFile, ExcelData("固定工作", "content", "result", "08:30", "09:30", "remarks"))
+    writeExcel(todayFile, excelData)
 
 
-writeExcel('tt.xls', 'sample', None)
-
-# if __name__ == '__main__':
-#
-#     file_name = time.strftime("%W") + ".xls"  # shutil.copy遇到中文名称会报错 所以取这一年第几周 作为文件名  result:15.xls
-#     full_filename = os.path.join(os.getcwd(), file_name)
-#     samplePath = os.path.join(os.path.dirname(os.path.dirname(os.getcwd())), ".importance\sample.xls")  # 样本路径
-#     print  samplePath
-#     # 判断这周的文件是否存在
-#     if not os.path.isfile(file_name):
-#         shutil.copy(samplePath, full_filename)  # 没有就把样本拷贝过来
-#
-#     workbook = xlrd.open_workbook(full_filename)
-#     print workbook.sheet_names()
-#     try:
-#         sampleSheet = workbook.sheet_by_name(u'sample')  # 打开样本sheet
-#     except Exception as  e:
-#         print e
-#
-#     try:
-#         todaySheet = workbook.sheet_by_name(time.strftime("%m月%d日").decode('utf-8', 'ignore'))
-#     except Exception as e:  # 没有当天的sheet
-#         todaySheet = copy.copy(sampleSheet)
-#         workbook._Workbook__worksheets.append(todaySheet)
-#         append_index = len(workbook._Workbook__worksheets) - 1
-#         workbook.set_active_sheet(append_index)
-#         workbook.get_sheet(append_index).set_name(time.strftime("%m月%d日").decode('utf-8', 'ignore'))
+if __name__ == '__main__':
+    checkAndWriteExcel(ExcelData("固定工作", "content", "result", "08:30", "09:30", "remarks"))
