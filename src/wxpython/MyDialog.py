@@ -68,5 +68,10 @@ class MyDialog(wx.Dialog):
 
     # Virtual event handlers, overide them in your derived class
     def OnClose(self, event):
-        self.Destroy() #关闭对话框
+        # self.Destroy() #关闭对话框
+        self.Hide()  # 隐藏对话框
         event.Skip()
+
+    def SetTimeLabel(self, time):
+        self.workPeriod.SetLabel(time)
+        pass

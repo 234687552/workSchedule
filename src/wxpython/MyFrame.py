@@ -131,7 +131,7 @@ class MyFrame(wx.Frame):
 
         # add by wxFormBuilder ↑↑↑↑↑↑↑↑↑  no modify by code
 
-        self.dialog = None
+        self.dialog = MyDialog()
         self.SetIcon(wx.Icon('.importance\loadIcon.ico', wx.BITMAP_TYPE_ICO))  # 设置图标
 
         self.Bind(wx.EVT_CLOSE, self.OnClose)  # 关闭按钮

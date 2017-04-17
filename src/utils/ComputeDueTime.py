@@ -26,39 +26,41 @@ def getDueTime(am_start, am_end, pm_start, pm_end, period, aheadTime=0):
     am_end = day + '12:00'
     pm_start = day + '13:30'
     pm_end = day + pm_end
-    result = []
+
     # 获取早上提醒时间
+    am_result = []
     temp = Str2TimeStamp(am_start) + period * 60
     am_end_timeStamp = Str2TimeStamp(am_end)
     while temp < am_end_timeStamp:
-        result.append(temp)
+        am_result.append(temp)
         temp += period * 60
 
     if (aheadTime > 0):  # 勾选了提前提示
-        if result[-1] > am_end_timeStamp - aheadTime * 60:
-            result[-1] = am_end_timeStamp - aheadTime * 60
+        if am_result[-1] > am_end_timeStamp - aheadTime * 60:
+            am_result[-1] = am_end_timeStamp - aheadTime * 60
         else:
-            result.append(am_end_timeStamp - aheadTime * 60)
+            am_result.append(am_end_timeStamp - aheadTime * 60)
     else:  # 不勾选了提前提示 则 最后提醒时间为下班时间
-        result.append(am_end_timeStamp)
+        am_result.append(am_end_timeStamp)
 
     # 获取下午提醒时间
+    pm_result = []
     temp = Str2TimeStamp(pm_start) + period * 60
     pm_end_timeStamp = Str2TimeStamp(pm_end)
 
     while temp < pm_end_timeStamp:
-        result.append(temp)
+        pm_result.append(temp)
         temp += period * 60
 
     if (aheadTime > 0):  # 勾选了提前提示
-        if result[-1] > pm_end_timeStamp - aheadTime * 60:
-            result[-1] = pm_end_timeStamp - aheadTime * 60
+        if pm_result[-1] > pm_end_timeStamp - aheadTime * 60:
+            pm_result[-1] = pm_end_timeStamp - aheadTime * 60
         else:
-            result.append(pm_end_timeStamp - aheadTime * 60)
+            pm_result.append(pm_end_timeStamp - aheadTime * 60)
     else:  # 不勾选了提前提示 则 最后提醒时间为下班时间
-        result.append(pm_end_timeStamp)
+        pm_result.append(pm_end_timeStamp)
 
-    return result
+    return am_result, pm_result
 
 
 '''
@@ -75,14 +77,14 @@ def Str2TimeStamp(strTime):
 
 
 '''
-# 时间戳转字符时间格式
+# 时间戳转字符时间格式 format = "%Y-%m-%d %H:%M:%S"
 # 1491957000 >>>>  2017-04-12 08:30:00
 '''
 
 
-def TimeStamp2Str(timeStamp):
+def TimeStamp2Str(timeStamp, format="%Y-%m-%d %H:%M:%S"):
     timeArray = time.localtime(float(timeStamp))
-    strTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
+    strTime = time.strftime(format, timeArray)
     return strTime
 
 
@@ -94,7 +96,10 @@ if __name__ == '__main__':
     period = 60
     aheadTime = 5
 
-    result = getDueTime(am_start, am_end, pm_start, pm_end, period, aheadTime)
+    am_result, pm_result = getDueTime(am_start, am_end, pm_start, pm_end, period, aheadTime)
 
-    for item in result:
+    for item in am_result:
+        print TimeStamp2Str(item)
+    print '------------------------'
+    for item in pm_result:
         print TimeStamp2Str(item)

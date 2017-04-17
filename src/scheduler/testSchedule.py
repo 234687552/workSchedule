@@ -3,6 +3,8 @@
 import datetime
 import time
 
+from apscheduler.triggers.interval import IntervalTrigger
+
 from src.scheduler.Scheduler import Scheduler
 
 
@@ -11,12 +13,12 @@ def my_job():
 
 
 if __name__ == '__main__':
-    scheduler = Scheduler.get_instance()
+    scheduler = Scheduler.getInstance().getScheduler()
     print time.strftime('%Y-%m-%d ') + time.strftime('%H:%M:%S')
     rundata = time.strftime('%Y-%m-%d ') + time.strftime('%H:%M:') + str((int(time.strftime('%S')) + 5))
     print rundata
-    scheduler.addJob(my_job, rundata)
-    scheduler.start()
+    scheduler.add_job(my_job, trigger=IntervalTrigger(seconds=3))
+
     try:
         # This is here to simulate application activity (which keeps the main thread alive).
         while True:

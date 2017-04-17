@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-
-def my_job(self):
+def show():
     print 'hello world',datetime.datetime.now()
