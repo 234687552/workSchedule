@@ -2,6 +2,8 @@
 
 import os
 import shutil
+
+import sys
 import xlrd
 import xlutils.copy
 import xlwt
@@ -57,10 +59,11 @@ def writeExcel(todayFile, excelData):
         ws.set_name(time.strftime("%m月%d日").decode('utf-8', 'ignore'))
         ws.write(1, 9, time.strftime("%Y-%m-%d").decode('utf-8', 'ignore'), ExcelStyle(hasBorders=False, bold=True))
     day = time.strftime("%Y-%m-%d ")  # 当天日期
+    freeX = 3
     if ComputeDueTime.Str2TimeStamp(day + excelData.start) <= ComputeDueTime.Str2TimeStamp(day + '12:00'):
         freeX = findFreeCell(rb.sheet_by_index(0), 3, 2)  # 早上从3,3找往下找空闲的cell
     else:
-        freex = findFreeCell(rb.sheet_by_index(0), 11, 2)  # 下午从3,3找往下找空闲的cell
+        freeX = findFreeCell(rb.sheet_by_index(0), 11, 2)  # 下午从3,3找往下找空闲的cell
 
     if len(excelData.workType) > 0:
         ws.write(freeX, 2, excelData.workType.decode('utf-8', 'ignore'), ExcelStyle())  # 工作类型
@@ -81,14 +84,16 @@ def writeExcel(todayFile, excelData):
 
 
 def checkAndWriteExcel(excelData):
-    rootPath = os.path.dirname(os.path.dirname(os.getcwd()))  # 程序所在更目录：当前目录的上一层的上一层
+    reload(sys)  # 2
+    sys.setdefaultencoding('utf-8')
+    # rootPath = os.path.dirname(os.path.dirname(os.getcwd()))  # 程序所在更目录：当前目录的上一层的上一层
+    rootPath = os.getcwd()  # 程序所在更目录：当前目录的上一层的上一层
     todayFile = os.path.join(rootPath, time.strftime("%m-%d") + ".xls")  # 保存文件的全路径
     if not os.path.exists(todayFile):
-        samplePath = os.path.join(
-            os.path.dirname(os.path.dirname(os.getcwd())), ".importance\sample.xls")  # 样本路径 当前目录的上一层的上一层
+        # samplePath = os.path.join(os.path.dirname(os.path.dirname(os.getcwd())), ".importance\sample.xls")  # 样本路径 当前目录的上一层的上一层
+        samplePath = os.path.join(os.getcwd(), ".importance\sample.xls")  # 样本路径 当前目录的上一层的上一层
         shutil.copy(samplePath, todayFile)
 
-    # writeExcel(todayFile, ExcelData("固定工作", "content", "result", "08:30", "09:30", "remarks"))
     writeExcel(todayFile, excelData)
 
 

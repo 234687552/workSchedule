@@ -128,7 +128,8 @@ class MyFrame(wx.Frame):
         # Connect Events
         self.reset.Bind(wx.EVT_BUTTON, self.OnReset)
         self.start_toggle.Bind(wx.EVT_BUTTON, self.OnStartToggle)
-
+        # 记得最后处理这里
+        self.reset.Hide()
         # add by wxFormBuilder ↑↑↑↑↑↑↑↑↑  no modify by code
 
         self.dialog = MyDialog()

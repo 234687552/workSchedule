@@ -69,8 +69,8 @@ def getDueTime(am_start, am_end, pm_start, pm_end, period, aheadTime=0):
 '''
 
 
-def Str2TimeStamp(strTime):
-    timeArray = time.strptime(strTime, "%Y-%m-%d %H:%M")
+def Str2TimeStamp(strTime, format="%Y-%m-%d %H:%M"):
+    timeArray = time.strptime(strTime, format)
     # 转换为时间戳:
     timeStamp = int(time.mktime(timeArray))
     return timeStamp
