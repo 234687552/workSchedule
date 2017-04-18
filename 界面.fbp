@@ -62,11 +62,11 @@
             <event name="OnAuiPaneRestore"></event>
             <event name="OnAuiRender"></event>
             <event name="OnChar"></event>
-            <event name="OnClose"></event>
+            <event name="OnClose">OnClose</event>
             <event name="OnEnterWindow"></event>
             <event name="OnEraseBackground"></event>
             <event name="OnHibernate"></event>
-            <event name="OnIconize"></event>
+            <event name="OnIconize">OnIconize</event>
             <event name="OnIdle"></event>
             <event name="OnKeyDown"></event>
             <event name="OnKeyUp"></event>

@@ -136,6 +136,7 @@ class MyFrame(wx.Frame):
         self.SetIcon(wx.Icon('.importance\loadIcon.ico', wx.BITMAP_TYPE_ICO))  # 设置图标
 
         self.Bind(wx.EVT_CLOSE, self.OnClose)  # 关闭按钮
+        self.Bind(wx.EVT_ICONIZE, self.OnIconize)
 
         self.taskBarIcon = TaskBarIcon(self)  # 设置程序为托盘形式
 
@@ -157,4 +158,15 @@ class MyFrame(wx.Frame):
         event.Skip()
 
     def OnClose(self, event):
+        # 关闭对话框
+        if self.dialog:
+            self.dialog.Destroy()
+
+        # 关闭托盘
+        self.taskBarIcon.Destroy()
+
+        # 关闭本体
+        self.Destroy()
+
+    def OnIconize(self, event):  # 最小化
         self.Hide()
